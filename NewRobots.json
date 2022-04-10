@@ -1,0 +1,26 @@
+[
+  {
+    "IdRobot": 1,
+    "XCoordinate": 1,
+    "YCoordinate": 1,
+    "Orientation": 1,
+    "RobotPath": "RFRFRFRF",
+    "isDead": false
+  },
+  {
+    "IdRobot": 2,
+    "XCoordinate": 3,
+    "YCoordinate": 2,
+    "Orientation": 0,
+    "RobotPath": "FRRFLLFFRRFLL",
+    "isDead": false
+  },
+  {
+    "IdRobot": 3,
+    "XCoordinate": 0,
+    "YCoordinate": 3,
+    "Orientation": 3,
+    "RobotPath": "LLFFFRFLFL",
+    "isDead": false
+  }
+]
