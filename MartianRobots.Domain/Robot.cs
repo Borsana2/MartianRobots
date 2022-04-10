@@ -84,7 +84,7 @@ namespace MartianRobots.Domain
 
 
             }
-            InsertRobotToDb(this);
+          
             grid.FinalRobotSituation.Add(this);
             return SetResult(false);
         }

@@ -1,14 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace MartianRobots.Domain
 {
     public class Grid
     {
-        [Key]
+        
         [JsonProperty]
         public int IdGrid { get; private set; }
         [JsonProperty]
@@ -46,8 +44,6 @@ namespace MartianRobots.Domain
                 gridResult += robot.ExecutePath(this) + "\n" ;
 
             }
-
-            InsertGridToDb(this);
             return gridResult;
         }
 
@@ -55,26 +51,10 @@ namespace MartianRobots.Domain
         {
             Scent recordScent = new Scent(robot.YCoordinate, robot.XCoordinate, robot.Orientation);
             ListScents.Add(recordScent);
-            recordScent.InsertScentToDb(recordScent);
+          
         }
 
-        private void InsertGridToDb(Grid grid)
-        {
-            using (var ctx = new MartianRobotsContext())
-            {
-                var gridToDB = new Grid()
-                {
-                    IdGrid = grid.IdGrid,
-                    MaxY = grid.MaxY,
-                    MaxX = grid.MaxX,
-                    ListScents = grid.ListScents ,
-                    FinalRobotSituation = grid.FinalRobotSituation
-                };
-
-                ctx.Grids.Add(gridToDB);
-                ctx.SaveChanges();
-            }
-        }
+     
 
     }
 

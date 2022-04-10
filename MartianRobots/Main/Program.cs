@@ -8,8 +8,8 @@ namespace MartianRobots
 {
     class Program
     {
-        private static string _pathRobot = @"./NewRobots.json";
-        private static string _pathGrid = @"./NewGrid.json";
+        private static string _pathRobot = @"./Samples/NewRobots.json";
+        private static string _pathGrid = @"./Samples/NewGrid.json";
        
         static void Main(string[] args)
         {
