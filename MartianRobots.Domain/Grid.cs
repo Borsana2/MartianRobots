@@ -12,6 +12,8 @@ namespace MartianRobots.Domain
         public int MaxX { get; private set; }
         [JsonProperty]
         public List<Scent> ListScents { get; private set; }
+        [JsonProperty]
+        public List<Robot> ListRobots { get; private set; }
 
         public Grid()
         {
@@ -25,6 +27,7 @@ namespace MartianRobots.Domain
             MaxY = (maxY + 1);
 
             ListScents = new List<Scent>();
+            ListRobots = new List<Robot>();
         }
 
         public String ResolveGrid(List<Robot> listRobots)

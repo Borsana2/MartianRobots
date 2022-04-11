@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace MartianRobots
 {
@@ -15,6 +16,9 @@ namespace MartianRobots
             List<Robot> listRobots = new List<Robot>();
             Grid grid = new Grid();
 
+            Console.WriteLine("----------------------------");
+            Console.WriteLine("-------MARTIAN ROBOTS-------");
+            Console.WriteLine("----------------------------");
             //Choosing data source.
             if (StartMenu().Equals("1"))
             {
@@ -29,12 +33,12 @@ namespace MartianRobots
 
             //Resolving the grid
             Console.WriteLine("----------------------------");
-            Console.WriteLine("-------MARTIAN ROBOTS-------");
+            Console.WriteLine("----------RESULTS-----------");
             Console.WriteLine("----------------------------");
             Console.WriteLine(grid.ResolveGrid(listRobots));
 
             //Show additional data.
-            ShowScentReport(grid);
+            ExtraInformationReport(grid);
         }
 
         private static String StartMenu()
@@ -242,9 +246,11 @@ namespace MartianRobots
             return true;
         }
 
-        private static void ShowScentReport(Grid grid)
+        private static void ExtraInformationReport(Grid grid)
         {
-            Console.WriteLine("Scents report: ");
+            int totalExploredSurface = 0;
+
+            Console.WriteLine("Information report: ");
             if (grid.ListScents == null)
             {
                 Console.WriteLine("No Scents reported");
@@ -256,6 +262,17 @@ namespace MartianRobots
                     Console.WriteLine(Scent.ToString());
                 }
             }
+
+            Console.WriteLine("There is " + grid.ListScents.Count + " Robots lost");
+
+            foreach (var finalRobot in grid.ListRobots)
+            {
+                totalExploredSurface += finalRobot.ExploredSurface;  
+            }
+
+            Console.WriteLine("The avarage explored surface per robot is: " + 
+                             (totalExploredSurface / grid.ListRobots.Count()) + " grid squares");
+           
         }
 
     }

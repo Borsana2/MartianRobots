@@ -19,6 +19,10 @@ namespace MartianRobots.Domain
         [JsonProperty]
         public String RobotPath { get; private set; }
 
+        [JsonProperty]
+        public int ExploredSurface { get; private set; }
+
+
         public Robot(int xCoordinate, int yCoordinate, Orientation orientation, string robotPath)
         {
             XCoordinate = xCoordinate;
@@ -45,10 +49,13 @@ namespace MartianRobots.Domain
                             //in case the next move it gets out of the grid.
                             //Thus, we still can record it's atributes on the grid.
                             var recordRobot = (Robot)MemberwiseClone();
+                            
                             MoveForward();
+                            RecordExploredSurface();
 
                             if (AmILost(grid))
                             {
+                                grid.ListRobots.Add(recordRobot);
                                 grid.AddScent(recordRobot);
                                 return recordRobot.SetResult(true);
                             }
@@ -62,11 +69,13 @@ namespace MartianRobots.Domain
                         break;
                     default:
                         //Not supported command.
-                        //Every comman introduced that doesn't match a instruction (F,R,L) is ignored.
+                        //Every command introduced that doesn't match a instruction (F,R,L) is ignored.
                         continue;
                 }
             }
-         return SetResult(false);
+
+            grid.ListRobots.Add(this);
+            return SetResult(false);
         }
 
         public void MoveForward()
@@ -142,7 +151,10 @@ namespace MartianRobots.Domain
             return XCoordinate + " " + YCoordinate + " " + Orientation.ToString() + (isDead ? " LOST" : "");
         }
 
-
+        private void RecordExploredSurface()
+        {
+            ExploredSurface += 1;
+        }
 
     }
 }
