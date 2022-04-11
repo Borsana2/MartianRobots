@@ -8,20 +8,18 @@ namespace MartianRobots
 {
     class Program
     {
-        private static string _pathRobot = @"./Samples/NewRobots.json";
-        private static string _pathGrid = @"./Samples/NewGrid.json";
-       
+        private static readonly string _pathRobot = @"./Samples/NewRobots.json";
+        private static readonly string _pathGrid = @"./Samples/NewGrid.json";
         static void Main(string[] args)
         {
             List<Robot> listRobots = new List<Robot>();
             Grid grid = new Grid();
 
-
-            //Choosing data source 
+            //Choosing data source.
             if (StartMenu().Equals("1"))
             {
                 grid = IntroduceGrid();
-                listRobots = IntroduceRobots();
+                listRobots = IntroduceRobots(grid);
             }
             else
             {
@@ -29,12 +27,22 @@ namespace MartianRobots
                 grid = DeserializeJsonGridFile();
             }
 
+            //Resolving the grid
             Console.WriteLine("----------------------------");
-            Console.WriteLine("MARTIAN ROBOTS");
+            Console.WriteLine("-------MARTIAN ROBOTS-------");
             Console.WriteLine("----------------------------");
             Console.WriteLine(grid.ResolveGrid(listRobots));
 
+            //Show additional data.
             ShowScentReport(grid);
+        }
+
+        private static String StartMenu()
+        {
+            Console.WriteLine("How do you want to introduce the Robots?");
+            Console.WriteLine("1 - Manualy / Else - From Json repository");
+
+            return Console.ReadLine();
         }
 
         private static String GetRobotsFromJsonFile()
@@ -52,7 +60,6 @@ namespace MartianRobots
         {
             var robotsFromJsonFile = GetRobotsFromJsonFile();
             return JsonConvert.DeserializeObject<List<Robot>>(robotsFromJsonFile);
-
         }
 
         private static String GetGridFromJsonFile()
@@ -70,86 +77,63 @@ namespace MartianRobots
         {
             var gridFromJsonFile = GetGridFromJsonFile();
             return JsonConvert.DeserializeObject<Grid>(gridFromJsonFile);
-
         }
 
-        private static void ShowScentReport(Grid grid)
-        {
-            Console.WriteLine("Scents report: ");
-            if (grid.ListScents == null)
-            {
-                Console.WriteLine("No Scents reported");
-            }
-            else
-            {
-                foreach (var Scent in grid.ListScents)
-                {
-                    Console.WriteLine(Scent.ToString());
-                }
-            }
-        }
-
-        private static String StartMenu()
-        {
-            Console.WriteLine("How do you want to introduce the Robots?");
-            Console.WriteLine("1 - Manualy / 2 - From Json repository");
-
-            return Console.ReadLine();
-        }
-
-        private static List<Robot> IntroduceRobots()
+        private static List<Robot> IntroduceRobots(Grid grid)
         {
             List<Robot> listRobots = new List<Robot>();
-            //variable declaration
-            String answerAnotherRobot;
-            String secondLineInstructions = "";
             int xAxis;
             int yAxis;
-            
-            Orientation orientation = Orientation.N;
 
-
-            Console.WriteLine("Is time to build your Robots");
+            Console.WriteLine("\nIs time to build your Robots");
             Console.WriteLine("---------------------------");
             Console.WriteLine("We will use the axis to place your robot on the grid");
 
             do
-            { 
-                yAxis = InsertAxis("Y");
-                xAxis = InsertAxis("X");
+            {
+                do
+                {
+                    xAxis = InsertAxis("X");
+                    yAxis = InsertAxis("Y");
+                } while (IsOutofTheGrid(yAxis, xAxis, grid));
 
-                orientation = InsertOrientation();
-
-                secondLineInstructions = InsertInstructions();
+                Orientation orientation = InsertOrientation();
+                string secondLineInstructions = InsertRobotInstructions();
 
                 var robotAux = new Robot(xAxis, yAxis, orientation, secondLineInstructions);
                 listRobots.Add(robotAux);
 
                 Console.WriteLine("Robot introduced successfully");
 
-                //Another robot?
-
                 Console.WriteLine("--------------------------------------------");
                 Console.WriteLine("Do you want to isert another Robot?");
                 Console.WriteLine("1 - yes / else - no");
-                answerAnotherRobot = Console.ReadLine().Trim();
-                
-            } while (answerAnotherRobot.Equals("1"));
+
+            } while (Console.ReadLine().Trim().Equals("1"));
 
             return listRobots;
         }
 
-        private static string InsertInstructions()
+        private static bool IsOutofTheGrid(int yAxis, int xAxis, Grid grid)
         {
-            String instructions = "";
-          
+            if (yAxis > (grid.MaxY-1) || xAxis > (grid.MaxX-1) || yAxis < 0 || xAxis < 0)
+            {
+                Console.WriteLine("You placed your robot out of the grid");
+                return true;
+            }
+            return false;
+        }
+
+        private static string InsertRobotInstructions()
+        {
+            string instructions;
             do
             {
                 Console.WriteLine("Insert instructions for movement:");
                 instructions = Console.ReadLine().ToUpper().Trim();
                 if (instructions.Length > 100)
                 {
-                    Console.WriteLine("The instructions String lenght must be under 100 characters");                   
+                    Console.WriteLine("The instructions String lenght must be under 100 characters");
                 }
 
             } while (instructions.Length > 100);
@@ -195,68 +179,84 @@ namespace MartianRobots
             return orientation;
         }
 
-        private static int InsertAxis(String axisType)
-        {
-            int axis;
-            do
-            {
-                Console.WriteLine($"Please, insert the {axisType} axis: ");
-                if (!int.TryParse(Console.ReadLine().Trim(), out axis))
-                {
-                    Console.WriteLine("Please, introduce a valid number");
-                }
-                
-            } while (!CheckCoordinateLength(axis));
-            return axis;
-
-        }
-
         private static bool IsCorrectOrientation(string orientationInput)
         {
             return orientationInput.Equals("N") || orientationInput.Equals("E") || orientationInput.Equals("W") || orientationInput.Equals("S");
         }
 
+        private static int InsertAxis(String axisType)
+        {
+            int axis;
+            bool isInt;
+            do
+            {
+                Console.WriteLine($"Please, insert the {axisType} axis: ");
+                isInt = int.TryParse(Console.ReadLine().Trim(), out axis);
+                if (!isInt)
+                {
+                    Console.WriteLine("Please, introduce a valid number");
+                }
+            } while (!CheckAxisLength(axis) || !isInt);
+
+            return axis;
+        }
+
+        private static bool CheckAxisLength(int positionAux)
+        {
+            if (positionAux > 50 || positionAux < 0) 
+            {
+                Console.WriteLine("We need a number between 0 and 50, inclusive");
+                return false;
+            }
+            return true;
+        }
+
         private static Grid IntroduceGrid()
         {
-          
-
-
+            int yGridAxis;
+            int xGridAxis;
             Console.WriteLine("Welcome to Martian Robots!");
             Console.WriteLine("---------------------------");
             Console.WriteLine("Please, configure your grid");
 
-            int yGridAxis = InsertAxis("Y");
-            int xGridAxis = InsertAxis("X");
-            
+            do
+            {
+                xGridAxis = InsertAxis("X");
+                yGridAxis = InsertAxis("Y");
+            } while (!IsARectangle(yGridAxis, xGridAxis));
 
-            Console.WriteLine("Your grid is ready. The size is: " + yGridAxis + " rows and " + xGridAxis + " columns.");
+
+            Console.WriteLine("Your grid is ready. The size is: " + (yGridAxis + 1) + " rows and " + (xGridAxis + 1) + " columns.");
 
             var grid = new Grid(xGridAxis, yGridAxis);
             return grid;
-
-
-
         }
 
-        private static bool CheckCoordinateLength(int positionAux)
+        private static bool IsARectangle(int yGridAxis, int xGridAxis)
         {
-            if (positionAux > 50)
+            if (yGridAxis == xGridAxis)
             {
-                Console.WriteLine("Sorry, the number needs to be under 51");
+                Console.WriteLine("Sorry, the grid needs to be shaped like a rectangle");
                 return false;
+            }
+            return true;
+        }
+
+        private static void ShowScentReport(Grid grid)
+        {
+            Console.WriteLine("Scents report: ");
+            if (grid.ListScents == null)
+            {
+                Console.WriteLine("No Scents reported");
             }
             else
             {
-                Console.WriteLine("Number entered correctly");
-                return true;
+                foreach (var Scent in grid.ListScents)
+                {
+                    Console.WriteLine(Scent.ToString());
+                }
             }
-
-
-
-
         }
-
-
 
     }
 

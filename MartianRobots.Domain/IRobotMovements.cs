@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MartianRobots.Domain
+﻿namespace MartianRobots.Domain
 {
     public interface IRobotMovements
     {
@@ -12,7 +6,8 @@ namespace MartianRobots.Domain
         public void TurnRight();
         public void TurnLeft();
 
-        
-
+       /* Used to provide more functionality to the robot in the future.
+        Notice that, in this option, the functionality will be added to 
+        the robot "vertically" and no "horizontally".*/
     }
 }
