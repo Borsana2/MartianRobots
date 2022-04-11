@@ -2,22 +2,20 @@
   {
     "XCoordinate": 1,
     "YCoordinate": 1,
-    "Orientation": 1,
-    "RobotPath": "RFRFRFRF",
-    "ExploredSurface": 0
+    "Orientation": "E",
+    "RobotPath": "RFRFRFRF"
   },
   {
     "XCoordinate": 3,
     "YCoordinate": 2,
-    "Orientation": 0,
-    "RobotPath": "FRRFLLFFRRFLL",
-    "ExploredSurface": 0
+    "Orientation": "N",
+    "RobotPath": "FRRFLLFFRRFLL"
   },
   {
     "XCoordinate": 0,
     "YCoordinate": 3,
-    "Orientation": 3,
-    "RobotPath": "LLFFFRFLFL",
-    "ExploredSurface": 0
+    "Orientation": "W",
+    "RobotPath": "LLFFFRFLFL"
   }
+
 ]

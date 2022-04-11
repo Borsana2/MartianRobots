@@ -11,6 +11,7 @@ namespace MartianRobots
     {
         private static readonly string _pathRobot = @"./Samples/NewRobots.json";
         private static readonly string _pathGrid = @"./Samples/NewGrid.json";
+        private static readonly string _pathRecord = @"./Record/RobotsRecord.txt";
         static void Main(string[] args)
         {
             List<Robot> listRobots = new List<Robot>();
@@ -19,6 +20,7 @@ namespace MartianRobots
             Console.WriteLine("----------------------------");
             Console.WriteLine("-------MARTIAN ROBOTS-------");
             Console.WriteLine("----------------------------");
+
             //Choosing data source.
             if (StartMenu().Equals("1"))
             {
@@ -37,14 +39,22 @@ namespace MartianRobots
             Console.WriteLine("----------------------------");
             Console.WriteLine(grid.ResolveGrid(listRobots));
 
-            //Show additional data.
-            ExtraInformationReport(grid);
+            //Show additional temporary data.
+            Console.WriteLine("----- Information report -----\n");
+
+            ScentRecord(grid);
+            AmountOfLostRobots(grid);
+            AVGExploredSurface(grid);
+
+            //Persist data in a .txt
+            AddToRecordRobotResults(grid);
         }
+
 
         private static String StartMenu()
         {
             Console.WriteLine("How do you want to introduce the Robots?");
-            Console.WriteLine("1 - Manualy / Else - From Json repository");
+            Console.WriteLine("1 - Manualy / Else - From a .json file");
 
             return Console.ReadLine();
         }
@@ -99,7 +109,7 @@ namespace MartianRobots
                 {
                     xAxis = InsertAxis("X");
                     yAxis = InsertAxis("Y");
-                } while (IsOutofTheGrid(yAxis, xAxis, grid));
+                } while (IsOutOfTheGrid(yAxis, xAxis, grid));
 
                 Orientation orientation = InsertOrientation();
                 string secondLineInstructions = InsertRobotInstructions();
@@ -118,11 +128,11 @@ namespace MartianRobots
             return listRobots;
         }
 
-        private static bool IsOutofTheGrid(int yAxis, int xAxis, Grid grid)
+        private static bool IsOutOfTheGrid(int yAxis, int xAxis, Grid grid)
         {
             if (yAxis > (grid.MaxY-1) || xAxis > (grid.MaxX-1) || yAxis < 0 || xAxis < 0)
             {
-                Console.WriteLine("You placed your robot out of the grid");
+                Console.WriteLine("Sorry, you placed your robot out of the grid");
                 return true;
             }
             return false;
@@ -246,33 +256,51 @@ namespace MartianRobots
             return true;
         }
 
-        private static void ExtraInformationReport(Grid grid)
+        private static void ScentRecord(Grid grid)
         {
-            int totalExploredSurface = 0;
 
-            Console.WriteLine("Information report: ");
-            if (grid.ListScents == null)
+            if (grid.ListScents.Count > 0)
             {
-                Console.WriteLine("No Scents reported");
+                Console.WriteLine("1. Scent record:");
+                foreach (var Scent in grid.ListScents)
+                {
+                    Console.WriteLine(" -" + Scent.ToString());
+                }
             }
             else
             {
-                foreach (var Scent in grid.ListScents)
-                {
-                    Console.WriteLine(Scent.ToString());
-                }
+                Console.WriteLine("1. Scent record:");
+                Console.WriteLine(" -No Scents reported");
             }
+        }
 
-            Console.WriteLine("There is " + grid.ListScents.Count + " Robots lost");
-
-            foreach (var finalRobot in grid.ListRobots)
+        private static void AVGExploredSurface(Grid grid)
+        {
+            int totalExploredSurface = 0;
+            foreach (var finalRobot in grid.FinalRobotsState)
             {
-                totalExploredSurface += finalRobot.ExploredSurface;  
+                totalExploredSurface += finalRobot.ExploredSurface;
             }
 
-            Console.WriteLine("The avarage explored surface per robot is: " + 
-                             (totalExploredSurface / grid.ListRobots.Count()) + " grid squares");
-           
+            Console.WriteLine("3. The avarage explored surface per robot is: " +
+                             (totalExploredSurface / grid.FinalRobotsState.Count()) + " grid squares");
+        }
+
+        private static void AmountOfLostRobots(Grid grid)
+        {
+            Console.WriteLine("2. There is/are " + grid.ListScents.Count + " lost Robots");
+        }
+
+        private static void AddToRecordRobotResults(Grid grid)
+        {
+            File.AppendAllText(_pathRecord, $"The grid used is: {grid.ToString()}\n");
+            foreach (var robot in grid.FinalRobotsState)
+            {
+                String text = robot.ToString() + ", Date:" + DateTime.Now.ToString("dd-MM-yyyy") + "\n";
+                File.AppendAllText(_pathRecord, text);
+            }
+            Console.WriteLine("\n ----- Stored information -----\n");
+            Console.WriteLine("Results added to RobotsRecords.txt");
         }
 
     }

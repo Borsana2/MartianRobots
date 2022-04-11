@@ -8,6 +8,6 @@
 
        /* Used to provide more functionality to the robot in the future.
         Notice that, in this option, the functionality will be added to 
-        the robot "vertically" and no "horizontally".*/
+        the robot class "vertically" and not "horizontally".*/
     }
 }

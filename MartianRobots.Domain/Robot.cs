@@ -9,19 +9,14 @@ namespace MartianRobots.Domain
     {
         [JsonProperty]
         public int XCoordinate { get; private set; }
-
         [JsonProperty]
         public int YCoordinate { get; private set; }
-
         [JsonProperty]
         public Orientation Orientation { get; private set; }
-
         [JsonProperty]
         public String RobotPath { get; private set; }
-
-        [JsonProperty]
         public int ExploredSurface { get; private set; }
-
+        public bool IsLost { get; private set; }
 
         public Robot(int xCoordinate, int yCoordinate, Orientation orientation, string robotPath)
         {
@@ -29,7 +24,8 @@ namespace MartianRobots.Domain
             YCoordinate = yCoordinate;
             Orientation = orientation;
             RobotPath = robotPath;
-
+            ExploredSurface = 0;
+            IsLost = false;
         }
 
         public String ExecutePath(Grid grid)
@@ -45,19 +41,20 @@ namespace MartianRobots.Domain
                         }
                         else
                         {
-                            //we clone the robot before the forward movement
+                            //we clone the robot before the forward movement,
                             //in case the next move it gets out of the grid.
-                            //Thus, we still can record it's atributes on the grid.
+                            //Thus, we still can record it's correct atributes on the grid.
                             var recordRobot = (Robot)MemberwiseClone();
                             
                             MoveForward();
-                            RecordExploredSurface();
+                            ExploredSurface += 1;
 
                             if (AmILost(grid))
                             {
-                                grid.ListRobots.Add(recordRobot);
+                                recordRobot.IsLost = true;
+                                grid.FinalRobotsState.Add(recordRobot);
                                 grid.AddScent(recordRobot);
-                                return recordRobot.SetResult(true);
+                                return recordRobot.SetResult();
                             }
                         }
                         break;
@@ -74,8 +71,8 @@ namespace MartianRobots.Domain
                 }
             }
 
-            grid.ListRobots.Add(this);
-            return SetResult(false);
+            grid.FinalRobotsState.Add(this);
+            return SetResult();
         }
 
         public void MoveForward()
@@ -146,16 +143,15 @@ namespace MartianRobots.Domain
             return grid.ListScents.Any(item => item.PosScentY == YCoordinate && item.PosSecntX == XCoordinate && item.OrientationScent == Orientation);
         }
 
-        private String SetResult(bool isDead)
+        private String SetResult()
         {
-            return XCoordinate + " " + YCoordinate + " " + Orientation.ToString() + (isDead ? " LOST" : "");
+            return XCoordinate + " " + YCoordinate + " " + Orientation.ToString() + (IsLost ? " LOST" : "");
         }
 
-        private void RecordExploredSurface()
+        public override string ToString()
         {
-            ExploredSurface += 1;
+            return "Robot: " + "Y axis: " + YCoordinate + ", X axis: " + XCoordinate + ", Orietation: " + Orientation.ToString() + ", Robot Path: " + RobotPath + ", State: " + (IsLost ? "LOST" : "NOT LOST") + ", Explored Surface: " + ExploredSurface + " grid squares";
         }
-
     }
 }
 

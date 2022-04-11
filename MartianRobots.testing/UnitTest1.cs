@@ -35,7 +35,7 @@ namespace MartianRobots.testing
             listRobots.Add(a);
             Robot b = new Robot(3, 2, Orientation.N, "FRFFRFFLF");
             listRobots.Add(b);
-            Robot c = new Robot(0, 0, Orientation.S, "RRRRF");
+            Robot c = new Robot(0, 0, Orientation.S, "R77RRRF");
             listRobots.Add(c);
 
             var grid = new Grid(5, 3);
